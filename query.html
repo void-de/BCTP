@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const checkedBoxes = [...checkboxes].filter(cb => cb.checked);
     if (checkedBoxes.length === 0) {
-      //resultsArea.innerHTML = '<p class="note">請勾選左側行為以查看對應法律後果。</p>';
+      resultsArea.innerHTML = '<p class="note">請勾選左側行為以查看對應法律後果。</p>';
       return;
     }
 
