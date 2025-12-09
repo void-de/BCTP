@@ -1,117 +1,125 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BCTP - 霸凌行為測驗</title>
-<link rel="stylesheet" href="style.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
-<style>
-  .quiz-question { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-  #score-box { margin-top: 20px; font-size: 1.2em; font-weight: bold; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCTP - 霸凌行為測驗</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+    <style>
+        .quiz-question { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        #score-box { margin-top: 20px; font-size: 1.2em; font-weight: bold; }
+    </style>
 </head>
 <body>
 <header>
-  <div class="container">
-    <h1>BCTP 測驗</h1>
-    <p>請回答以下問題，達 60 分才能進入反思表單。</p>
-  </div>
+    <div class="container">
+        <h1>BCTP 測驗</h1>
+        <p>請回答以下問題，達 60 分才能進入反思表單。</p>
+    </div>
 </header>
 
 <main>
-  <div class="container">
-    <div id="quiz-container"></div>
-
-    <button id="next-btn" class="btn-animated btn-green">
-      <span class="default-text">下一步：反思表單 →</span>
-      <span class="hover-text">提交測驗</span>
-    </button>
-
-    <div id="score-box"></div>
-  </div>
+    <div class="container">
+        <div id="quiz-container"></div> <!-- 顯示測驗問題的區域 -->
+        <button id="next-btn" class="btn-animated btn-green">
+            <span class="default-text">下一步：反思表單 →</span>
+            <span class="hover-text">提交測驗</span>
+        </button>
+        <div id="score-box"></div> <!-- 顯示分數的區域 -->
+    </div>
 </main>
 
 <footer>
-  <p>BCTP (Bullying Consequence Transparency Platform)</p>
+    <p>BCTP (Bullying Consequence Transparency Platform)</p>
 </footer>
 
 <script>
 document.addEventListener('DOMContentLoaded', async function() {
-  const QUIZ_JSON_URL = 'https://raw.githubusercontent.com/voidSTU/BCTP/refs/heads/main/QuizJson.json';
-  const quizContainer = document.getElementById('quiz-container');
-  const nextBtn = document.getElementById('next-btn');
-  const scoreBox = document.getElementById('score-box');
+    const QUIZ_JSON_URL = 'https://raw.githubusercontent.com/voidSTU/BCTP/refs/heads/main/QuizJson.json'; // 題庫資料來源
+    const quizContainer = document.getElementById('quiz-container'); // 顯示問題的容器
+    const nextBtn = document.getElementById('next-btn'); // 下一步按鈕
+    const scoreBox = document.getElementById('score-box'); // 顯示分數的容器
 
-  let quizQuestions = [];
-  let score = 0;
+    let quizQuestions = []; // 儲存題目的數組
+    let score = 0; // 儲存分數
 
-  const selectedQuestionTypes = JSON.parse(localStorage.getItem('selectedQuestionTypes') || '[]');
-  if (!selectedQuestionTypes.length) {
-    alert('未選擇行為類型，將返回行為勾選頁');
-    window.location.href = 'query.html';
-    return;
-  }
-
-  try {
-    const res = await fetch(QUIZ_JSON_URL);
-    const data = await res.json();
-    let filtered = data.questions.filter(q => selectedQuestionTypes.includes(q.questionType));
-    if (!filtered.length) {
-      quizContainer.innerHTML = '<p>沒有符合所選行為的題目。</p>';
-      nextBtn.disabled = true;
-      return;
+    // 從 localStorage 獲取選擇的問題類型
+    const selectedQuestionTypes = JSON.parse(localStorage.getItem('selectedQuestionTypes') || '[]');
+    if (!selectedQuestionTypes.length) {
+        alert('未選擇行為類型，將返回行為勾選頁');
+        window.location.href = 'query.html'; // 若未選擇行為類型，跳轉回行為勾選頁
+        return;
     }
-    quizQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, 10);
-  } catch (err) {
-    console.error(err);
-    alert('題庫載入失敗，請稍後再試');
-    return;
-  }
 
-  function renderQuiz() {
-    quizContainer.innerHTML = '';
-    quizQuestions.forEach((q, idx) => {
-      const div = document.createElement('div');
-      div.className = 'quiz-question';
-      div.innerHTML = `<h3>${idx+1}. ${q.question}</h3>`;
-      q.options.forEach((opt, i) => {
-        const label = document.createElement('label');
-        label.innerHTML = `<input type="radio" name="q${idx}" value="${i}"> ${opt}`;
-        div.appendChild(label);
-        div.appendChild(document.createElement('br'));
-      });
-      quizContainer.appendChild(div);
-    });
-    scoreBox.textContent = '';
-  }
+    try {
+        // 載入題庫資料
+        const res = await fetch(QUIZ_JSON_URL);
+        const data = await res.json();
 
-  renderQuiz();
+        // 過濾出符合選擇的問題類型
+        let filtered = data.questions.filter(q => selectedQuestionTypes.includes(q.questionType));
+        if (!filtered.length) {
+            quizContainer.innerHTML = '<p>沒有符合所選行為的題目。</p>';
+            nextBtn.disabled = true; // 沒有題目則禁用“下一步”按鈕
+            return;
+        }
 
-  nextBtn.addEventListener('click', function() {
-    score = 0;
-    quizQuestions.forEach((q, idx) => {
-      const selected = quizContainer.querySelector(`input[name="q${idx}"]:checked`);
-      if (selected && Number(selected.value) === q.correctAnswerIndex) score += 10;
-    });
-
-    if (score >= 60) {
-      localStorage.setItem('quizAnswers', JSON.stringify({
-        questionTypes: selectedQuestionTypes,
-        answers: quizQuestions.map((q, idx) => {
-          const selected = quizContainer.querySelector(`input[name="q${idx}"]:checked`);
-          return selected ? Number(selected.value) : null;
-        })
-      }));
-      window.location.href = 'form.html';
-    } else {
-      alert(`未達 60 分，分數：${score} 分 → 題目將重新洗牌`);
-      scoreBox.textContent = `分數：${score} 分，請重新答題`;
-      score = 0;
-      quizQuestions.sort(() => 0.5 - Math.random());
-      renderQuiz();
+        // 隨機選擇 10 題
+        quizQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, 10);
+    } catch (err) {
+        console.error(err);
+        alert('題庫載入失敗，請稍後再試');
+        return;
     }
-  });
+
+    // 渲染題目
+    function renderQuiz() {
+        quizContainer.innerHTML = ''; // 清空現有的問題內容
+        quizQuestions.forEach((q, idx) => {
+            const div = document.createElement('div');
+            div.className = 'quiz-question';
+            div.innerHTML = `<h3>${idx+1}. ${q.question}</h3>`; // 顯示問題
+            q.options.forEach((opt, i) => {
+                const label = document.createElement('label');
+                label.innerHTML = `<input type="radio" name="q${idx}" value="${i}"> ${opt}`; // 顯示選項
+                div.appendChild(label);
+                div.appendChild(document.createElement('br'));
+            });
+            quizContainer.appendChild(div);
+        });
+        scoreBox.textContent = ''; // 清空分數顯示
+    }
+
+    renderQuiz(); // 初始渲染題目
+
+    // 監聽“下一步”按鈕的點擊事件
+    nextBtn.addEventListener('click', function() {
+        score = 0; // 重置分數
+        quizQuestions.forEach((q, idx) => {
+            // 判斷是否選對了問題
+            const selected = quizContainer.querySelector(`input[name="q${idx}"]:checked`);
+            if (selected && Number(selected.value) === q.correctAnswerIndex) score += 10; // 每答對一題加 10 分
+        });
+
+        // 若分數大於或等於 60，跳轉到反思表單
+        if (score >= 60) {
+            localStorage.setItem('quizAnswers', JSON.stringify({
+                questionTypes: selectedQuestionTypes,
+                answers: quizQuestions.map((q, idx) => {
+                    const selected = quizContainer.querySelector(`input[name="q${idx}"]:checked`);
+                    return selected ? Number(selected.value) : null;
+                })
+            }));
+            window.location.href = 'form.html'; // 進入反思表單
+        } else {
+            alert(`未達 60 分，分數：${score} 分 → 題目將重新洗牌`);
+            scoreBox.textContent = `分數：${score} 分，請重新答題`; // 顯示分數並告知用戶重答
+            score = 0; // 重置分數
+            quizQuestions.sort(() => 0.5 - Math.random()); // 重新洗牌題目
+            renderQuiz(); // 重新渲染題目
+        }
+    });
 });
 </script>
 
