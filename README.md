@@ -68,7 +68,7 @@ Receives data sent from `form.html`, including:
 
 All data is stored and managed using Google Sheets via Apps Script.
 
-```javascript=
+~~~javascript
 const SHEET_NAME = "record";  // 設定要操作的試算表工作表名稱
 
 function doPost(e) {
@@ -115,4 +115,4 @@ function doPost(e) {
   }
 }
 
-```
+~~~
