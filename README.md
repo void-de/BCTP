@@ -54,7 +54,7 @@ Defines the layout and visual style of the HTML pages.
 ### Logo
 (Platform logo design used in the website)
 
-<img width="200" height="200" src="https://github.com/user-attachments/assets/36c05b85-38e2-4c21-ba54-f9e8347bf3c8">
+<img width="200" height="200" src="https://github.com/user-attachments/assets/c826f20c-f673-4e16-ab3b-cf505c000760">
 
 ---
 
